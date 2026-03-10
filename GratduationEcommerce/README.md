@@ -69,9 +69,6 @@ Cấu hình MySQL trong `compose.yaml`:
 - Root password: `verysecret`
 - Port mapping: `3306:3306`
 
-Lưu ý quan trọng:
-- Hiện tại cổng DB đang lệch nhau (`app = 3307`, `docker = 3306`).
-- Bạn cần đồng bộ một trong hai bên để ứng dụng kết nối được MySQL.
 
 ## SQL Init / Migration với Docker
 
@@ -99,12 +96,6 @@ Build project:
 
 ```bash
 ./mvnw clean package
-```
-
-Chạy test:
-
-```bash
-./mvnw test
 ```
 
 ## Một số lệnh hữu ích
