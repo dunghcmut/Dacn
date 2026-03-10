@@ -1,8 +1,8 @@
 # GratduationEcommerce
 
-Backend ecommerce built with Spring Boot, Spring Data JPA, Spring Security, and MySQL.
+Backend thương mại điện tử xây dựng bằng Spring Boot, Spring Data JPA, Spring Security và MySQL.
 
-## Tech Stack
+## Công nghệ sử dụng
 
 - Java 21
 - Spring Boot 4.0.3
@@ -11,118 +11,130 @@ Backend ecommerce built with Spring Boot, Spring Data JPA, Spring Security, and 
 - Maven Wrapper (`./mvnw`)
 - MySQL 8.4 (Docker Compose)
 
-## Project Structure
+## Cấu trúc thư mục
 
-- `src/main/java`: source code
-- `src/main/resources/application.properties`: application configuration
-- `compose.yaml`: Docker service for MySQL
-- `docker/mysql/init`: SQL init/migration scripts for first database bootstrap
+- `src/main/java`: mã nguồn chính
+- `src/main/resources/application.properties`: cấu hình ứng dụng
+- `compose.yaml`: cấu hình dịch vụ MySQL cho Docker
+- `docker/mysql/init`: script SQL khởi tạo/migrate ban đầu
 
-## Prerequisites
+## Yêu cầu trước khi chạy
 
-- JDK 21+
+- JDK 21 trở lên
 - Docker + Docker Compose
-- (Optional) IntelliJ IDEA / VS Code
+- (Tùy chọn) IntelliJ IDEA / VS Code
 
-## Quick Start
+## Chạy nhanh
 
-1. Start MySQL container:
+1. Khởi động MySQL bằng Docker:
 
 ```bash
 docker compose up -d
 ```
 
-2. Run application:
+2. Chạy ứng dụng Spring Boot:
 
 ```bash
 ./mvnw spring-boot:run
 ```
 
-3. Stop MySQL when done and reset:
+3. Dừng MySQL:
 
 ```bash
-sudo docker compose down -v
+docker compose down
 ```
 
-## Database Configuration
+4. Dừng và xóa luôn volume dữ liệu (reset DB):
 
-Current application database config (`src/main/resources/application.properties`):
+```bash
+docker compose down -v
+```
 
-- URL: `jdbc:mysql://localhost:3306/mydatabase`
+## Cấu hình cơ sở dữ liệu
+
+Cấu hình hiện tại trong `src/main/resources/application.properties`:
+
+- URL: `jdbc:mysql://localhost:3307/mydatabase`
 - Username: `myuser`
 - Password: `secret`
 - Driver: `com.mysql.cj.jdbc.Driver`
-- Hibernate DDL: `none`
+- Hibernate DDL: `validate`
 
-MySQL container config (`compose.yaml`):
+Cấu hình MySQL trong `compose.yaml`:
 
 - Image: `mysql:8.4`
 - Database: `mydatabase`
 - User: `myuser`
 - Password: `secret`
 - Root password: `verysecret`
-- Port mapping: `3307:3306`
+- Port mapping: `3306:3306`
 
-## SQL Init / Migration (Docker)
+Lưu ý quan trọng:
+- Hiện tại cổng DB đang lệch nhau (`app = 3307`, `docker = 3306`).
+- Bạn cần đồng bộ một trong hai bên để ứng dụng kết nối được MySQL.
 
-Folder: `docker/mysql/init`
+## SQL Init / Migration với Docker
 
-- Place SQL files in ordered naming format, for example:
-  - `001_init_schema.sql`
-  - `002_seed_data.sql`
-  - `003_add_indexes.sql`
-- MySQL Docker entrypoint executes these scripts only when the data volume is created for the first time.
+Thư mục: `docker/mysql/init`
 
-If you changed SQL init files and want them to run again from scratch:
+Quy ước đặt tên file theo thứ tự, ví dụ:
+- `001_init_schema.sql`
+- `002_seed_data.sql`
+- `003_add_indexes.sql`
+
+MySQL Docker chỉ tự chạy các file trong thư mục này khi volume dữ liệu được tạo lần đầu.
+
+Nếu đã sửa SQL và muốn chạy lại từ đầu:
 
 ```bash
 docker compose down -v
 docker compose up -d
 ```
 
-Warning: `down -v` removes current MySQL data volume.
+Cảnh báo: `down -v` sẽ xóa toàn bộ dữ liệu MySQL hiện có.
 
-## Build and Test
+## Build và Test
 
-Build:
+Build project:
 
 ```bash
 ./mvnw clean package
 ```
 
-Run tests:
+Chạy test:
 
 ```bash
 ./mvnw test
 ```
 
-## Useful Commands
+## Một số lệnh hữu ích
 
-Show running containers:
+Kiểm tra container đang chạy:
 
 ```bash
 docker compose ps
 ```
 
-View MySQL logs:
+Xem log MySQL:
 
 ```bash
 docker compose logs -f mysql
 ```
 
-Open MySQL shell:
+Vào MySQL shell trong container:
 
 ```bash
 docker exec -it grad-ecommerce-mysql mysql -umyuser -psecret mydatabase
 ```
 
-## Notes
+## Ghi chú
 
-- Project currently includes `spring-boot-starter-security`. Without custom security configuration, default Spring Security behavior will be applied.
-- `spring-boot-docker-compose` dependency is enabled, so Spring Boot can integrate with Docker Compose during local development.
+- Project đang dùng `spring-boot-starter-security`; nếu chưa cấu hình riêng, Spring Security mặc định sẽ được áp dụng.
+- Project có dependency `spring-boot-docker-compose`.
+- `spring.docker.compose.enabled=false` đang được đặt trong `application.properties`, nghĩa là Spring Boot sẽ không tự quản lý Docker Compose khi chạy app.
 
-## Next Suggested Improvements
+## Đề xuất cải tiến tiếp theo
 
-- Add profile-based config (`application-dev.properties`, `application-prod.properties`).
-- Add Flyway or Liquibase for versioned, repeatable database migration in app lifecycle.
-- Move database credentials to environment variables.
+- Tách cấu hình theo môi trường (`application-dev.properties`, `application-prod.properties`).
+- Dùng Flyway hoặc Liquibase để quản lý migration theo version một cách chuẩn hóa.
+- Đưa thông tin nhạy cảm (DB user/password) sang biến môi trường.
